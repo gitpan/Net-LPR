@@ -11,7 +11,7 @@ use Sys::Hostname;
 
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 
-$VERSION = '1.003';
+$VERSION = '1.004';
 
 my %valid_options = (
     StrictRFCPorts => 1,
@@ -117,7 +117,7 @@ sub connect {
                 ReuseAddr => 1,
             );
             last if (defined($sock));
-            last unless ($! =~ /in use/);
+            last unless ($! =~ /in use|bad file number/i);
         }
         unless (defined($sock)) {
             if ($!) {

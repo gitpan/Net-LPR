@@ -14,3 +14,6 @@ Revision history for Perl extension Net::LPR.
 1.003  March 13, 2003
 	Fix incorrect assumption that $^O is win32 under windows.
 	Fix incorrect date in Changes file.
+
+1.004  May 1, 2003
+	Work around Solaris 2.6 bahavior when creating a socket whose address is in use (EBADF).
