@@ -11,7 +11,7 @@ use Sys::Hostname;
 
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 
-$VERSION = '1.002';
+$VERSION = '1.003';
 
 my %valid_options = (
     StrictRFCPorts => 1,
@@ -440,7 +440,7 @@ sub new_job {
     
     my $user;
     
-    if ($^O eq 'win32') {
+    if ($^O eq 'MSWin32') {
     	$user = getlogin();
     } else {
     	$user = scalar(getpwuid($>));
