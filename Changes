@@ -6,3 +6,7 @@ Revision history for Perl extension Net::LPR.
 1.001  October 14, 2002
 	Fix bug in job_send_data that prevented proper usage.
 
+1.002  March 12, 2002
+	Fix warnings in job_mode_* and job_send_data.
+	Fix problem that prevented module from functioning properly under win32.
+	Add examples and notes to documentation.

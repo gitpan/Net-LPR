@@ -11,7 +11,7 @@ use Sys::Hostname;
 
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 
-$VERSION = '1.001';
+$VERSION = '1.002';
 
 my %valid_options = (
     StrictRFCPorts => 1,
@@ -438,6 +438,14 @@ sub new_job {
         return undef;
     }
     
+    my $user;
+    
+    if ($^O eq 'win32') {
+    	$user = getlogin();
+    } else {
+    	$user = scalar(getpwuid($>));
+    }
+    
     $self->{Jobs}->{$jobkey} = {
         JobID => $jobid,
         Jobname => $jobname,
@@ -451,7 +459,7 @@ sub new_job {
         DataSent => 0,
         CE => {
             H => hostname(),
-            P => scalar(getpwuid($>)),
+            P => $user,
         },
     };
     
@@ -1046,7 +1054,7 @@ sub job_mode_cif {
 
     $job->{UsedDataFileName} = 1;
     
-    if (length($f)) {
+    if (defined($f) && length($f)) {
         delete $job->{CE}->{W} if ($f eq 'f' || $f eq 'l' || $f eq 'p');
         delete $job->{CE}->{T} if ($f eq 'p');
         delete $job->{CE}->{I} if ($f eq 'f' || $f eq 'l');
@@ -1084,7 +1092,7 @@ sub job_mode_dvi {
 
     $job->{UsedDataFileName} = 1;
     
-    if (length($f)) {
+    if (defined($f) && length($f)) {
         delete $job->{CE}->{W} if ($f eq 'f' || $f eq 'l' || $f eq 'p');
         delete $job->{CE}->{T} if ($f eq 'p');
         delete $job->{CE}->{I} if ($f eq 'f' || $f eq 'l');
@@ -1138,7 +1146,7 @@ sub job_mode_text {
 
     $job->{UsedDataFileName} = 1;
     
-    if (length($f)) {
+    if (defined($f) && length($f)) {
         delete $job->{CE}->{W} if ($f eq 'f' || $f eq 'l' || $f eq 'p');
         delete $job->{CE}->{T} if ($f eq 'p');
         delete $job->{CE}->{I} if ($f eq 'f' || $f eq 'l');
@@ -1184,7 +1192,7 @@ sub job_mode_plot {
 
     $job->{UsedDataFileName} = 1;
     
-    if (length($f)) {
+    if (defined($f) && length($f)) {
         delete $job->{CE}->{W} if ($f eq 'f' || $f eq 'l' || $f eq 'p');
         delete $job->{CE}->{T} if ($f eq 'p');
         delete $job->{CE}->{I} if ($f eq 'f');
@@ -1222,7 +1230,7 @@ sub job_mode_ditroff {
 
     $job->{UsedDataFileName} = 1;
     
-    if (length($f)) {
+    if (defined($f) && length($f)) {
         delete $job->{CE}->{W} if ($f eq 'f' || $f eq 'l' || $f eq 'p');
         delete $job->{CE}->{T} if ($f eq 'p');
         delete $job->{CE}->{I} if ($f eq 'f' || $f eq 'l');
@@ -1260,7 +1268,7 @@ sub job_mode_postscript {
 
     $job->{UsedDataFileName} = 1;
     
-    if (length($f)) {
+    if (defined($f) && length($f)) {
         delete $job->{CE}->{W} if ($f eq 'f' || $f eq 'l' || $f eq 'p');
         delete $job->{CE}->{T} if ($f eq 'p');
         delete $job->{CE}->{I} if ($f eq 'f' || $f eq 'l');
@@ -1318,7 +1326,7 @@ sub job_mode_pr {
 
     $job->{UsedDataFileName} = 1;
     
-    if (length($f)) {
+    if (defined($f) && length($f)) {
         delete $job->{CE}->{W} if ($f eq 'f' || $f eq 'l' || $f eq 'p');
         delete $job->{CE}->{T} if ($f eq 'p');
         delete $job->{CE}->{I} if ($f eq 'f' || $f eq 'l');
@@ -1358,7 +1366,7 @@ sub job_mode_fortran {
 
     $job->{UsedDataFileName} = 1;
     
-    if (length($f)) {
+    if (defined($f) && length($f)) {
         delete $job->{CE}->{W} if ($f eq 'f' || $f eq 'l' || $f eq 'p');
         delete $job->{CE}->{T} if ($f eq 'p');
         delete $job->{CE}->{I} if ($f eq 'f' || $f eq 'l');
@@ -1396,7 +1404,7 @@ sub job_mode_troff {
 
     $job->{UsedDataFileName} = 1;
     
-    if (length($f)) {
+    if (defined($f) && length($f)) {
         delete $job->{CE}->{W} if ($f eq 'f' || $f eq 'l' || $f eq 'p');
         delete $job->{CE}->{T} if ($f eq 'p');
         delete $job->{CE}->{I} if ($f eq 'f' || $f eq 'l');
@@ -1434,7 +1442,7 @@ sub job_mode_raster {
 
     $job->{UsedDataFileName} = 1;
     
-    if (length($f)) {
+    if (defined($f) && length($f)) {
         delete $job->{CE}->{W} if ($f eq 'f' || $f eq 'l' || $f eq 'p');
         delete $job->{CE}->{T} if ($f eq 'p');
         delete $job->{CE}->{I} if ($f eq 'f' || $f eq 'l');
@@ -1570,10 +1578,17 @@ sub job_send_data {
 
     if ($self->{Mode} == 2) {
 
-        $self->{Socket}->print("\003$totalsize ".$self->{Jobs}->{$jobkey}->{DataFileName}."\n") or do {
-            $self->_report("Error sending command ($!)");
-            return undef;
-        };
+	if (defined($totalsize)) {
+            $self->{Socket}->print("\003$totalsize ".$self->{Jobs}->{$jobkey}->{DataFileName}."\n") or do {
+        	$self->_report("Error sending command ($!)");
+        	return undef;
+            };
+	} else {
+            $self->{Socket}->print("\003 ".$self->{Jobs}->{$jobkey}->{DataFileName}."\n") or do {
+        	$self->_report("Error sending command ($!)");
+        	return undef;
+            };
+        }
 
         $self->{Socket}->flush() or do {
             $self->_report("Error flushing buffer ($!)");

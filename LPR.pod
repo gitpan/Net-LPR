@@ -455,7 +455,9 @@ This method sends data to the printer.
 If the object is in JOB command mode, and the two-argument form is used,
 DATA command mode is entered and the printer continues to accept data
 until the connection is broken with the B<disconnect> method, or by the
-Net::LPR object going out of scope or being destroyed.
+Net::LPR object going out of scope or being destroyed.  B<NOTE>:  Some
+printers may not accept the two-argument form, so it is recommended that
+you use the three-argument form to specify the length of your data.
 
 If the object is in JOB command mode, and the three-argument form is used,
 the data is sent to the printer.  If the length of data is less than the
@@ -469,8 +471,87 @@ DATA mode, the data will be sent to the printer, and if the total size
 was specified, and the amount of data sent matches the total size, JOB
 command mode will be re-entered.
 
+If you are sending multiple jobs to the same printer, you should
+disconnect and connect again after each job.  This will ensure that
+the printer is in a consistant state.
+
 You must be in JOB or DATA command mode to use this method.  This method
 returns B<true> on success or B<undef> on error.
+
+=head1 EXAMPLES
+
+Here are some example scripts.
+
+=head2 Example 1: Hello World
+
+This example uses RaiseError to automatically die if an error occurs.
+
+  #!/usr/bin/perl -w
+  
+  use strict;
+  
+  use Net::LPR;
+  
+  my $lp = new Net::LPR(
+  	StrictRFCPorts => 0,
+	RemoteServer => 'localhost',
+	RemotePort => 515,
+	PrintErrors => 0,
+	RaiseErrors => 1,
+  );
+  
+  my $data = "Hello World";
+  
+  $lp->connect();
+  
+  my $jobkey = $lp->new_job();
+  
+  $lp->send_jobs('lp');
+  $lp->job_mode_text($jobkey);
+  $lp->job_send_control_file($jobkey);
+  $lp->job_send_data($jobkey, $data, length($data));
+  $lp->disconnect();
+
+=head2 Example 2: Print a text file
+
+This example does not automatically die when an error occurs; therefore
+we must check the return value of each method.  Also, this example does
+not account for "stair-stepping" on UNIX platforms.
+
+  #!/usr/bin/perl -w
+  
+  use strict;
+  use vars '@ARGV';
+  
+  use Net::LPR;
+  use IO::File;
+  
+  die "usage: $0 <filename> <printer> <queue>\n" if (@ARGV != 3);
+  
+  my $lp = new Net::LPR(
+  	StrictRFCPorts => 0,
+	RemoteServer => $ARGV[1],
+	RemotePort => 515,
+	PrintErrors => 0,
+	RaiseErrors => 0,
+  ) or die "Can't create print context\n";
+  
+  my $fh = new IO::File $ARGV[0], O_RDONLY or die "Can't open $ARGV[0]: $!\n";
+  my $size = ($fh->stat())[7]; # Hope file doesn't change while printing
+  
+  $lp->connect() or die "Can't connect to printer: ".$lp->error."\n";
+  my $jobkey = $lp->new_job() or die "Can't create new job: ".$lp->error."\n";
+  $lp->send_jobs('lp') or die "Can't send jobs: ".$lp->error."\n";
+  # Can easily print postscript by changing method to job_mode_postscript
+  $lp->job_mode_text($jobkey) or die "Can't set job mode to text: ".$lp->error."\n";
+  $lp->job_send_control_file($jobkey) or die "Can't send control file: ".$lp->error."\n";
+  $lp->job_send_data($jobkey, '', $size);
+  
+  while (my $line = $fh->getline()) {
+  	$lp->job_send_data($jobkey, $line);
+  }
+  
+  $lp->disconnect();
 
 =head1 BUGS
 
