@@ -2,3 +2,7 @@ Revision history for Perl extension Net::LPR.
 
 1.000  October 7, 2002
 	Initial version release.
+
+1.001  October 14, 2002
+	Fix bug in job_send_data that prevented proper usage.
+

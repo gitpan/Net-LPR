@@ -11,7 +11,7 @@ use Sys::Hostname;
 
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 
-$VERSION = '1.000';
+$VERSION = '1.001';
 
 my %valid_options = (
     StrictRFCPorts => 1,
@@ -1540,9 +1540,9 @@ sub job_send_data {
     my $self = shift;
     
     if ($self->{Mode} == 2) {
-        croak 'JOB Mode Usage: $lp->job_send_data($jobkey, $data [, $totalsize])' unless (@_ >= 3 && @_ <= 4);
+        croak 'JOB Mode Usage: $lp->job_send_data($jobkey, $data [, $totalsize])' unless (@_ >= 2 && @_ <= 3);
     } elsif ($self->{Mode} == 3) {
-        croak 'DATA Mode Usage: $lp->job_send_data($jobkey, $data)' unless (@_ == 3);
+        croak 'DATA Mode Usage: $lp->job_send_data($jobkey, $data)' unless (@_ == 2);
     } else {
         $self->_report("Not in JOB or DATA command mode");
     }
@@ -1561,7 +1561,7 @@ sub job_send_data {
     
     my $data = shift;
 
-    my $totalsize = shift || "";
+    my $totalsize = shift;
 
     if (defined($totalsize) && $totalsize !~ /^\d+$/) {
         $self->_report("Size argument must be numeric");
