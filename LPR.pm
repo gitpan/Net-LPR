@@ -11,7 +11,7 @@ use Sys::Hostname;
 
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 
-$VERSION = '1.005';
+$VERSION = '1.006';
 
 my %valid_options = (
     StrictRFCPorts => 1,
@@ -423,7 +423,7 @@ sub new_job {
         return undef;
     }
     
-    $g_job_id = $jobid + 1 % 1000;
+    $g_job_id = ($jobid + 1) % 1000;
 
     my $jobname = shift;
     

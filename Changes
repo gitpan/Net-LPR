@@ -20,3 +20,6 @@ Revision history for Perl extension Net::LPR.
 
 1.005  Jan 6, 2004
 	Fix a bug where the set_control_filename method was actually setting the data file name (thanks to Andreas Håkansson).
+
+1.006  Apr 1, 2004
+	Fix a bug where the global jobid may run rampant when new_job() is called without arguments (thanks to Daniel Hentschel).
