@@ -11,7 +11,7 @@ use Sys::Hostname;
 
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 
-$VERSION = '1.006';
+$VERSION = '1.007';
 
 my %valid_options = (
     StrictRFCPorts => 1,
@@ -1599,7 +1599,7 @@ sub job_send_data {
 
         $result = $self->{Socket}->getc();
 
-        if (length($result)) {
+        if (defined($result) && length($result)) {
             $result = unpack("C", $result);
         } else {
             $self->_report("Error getting result ($!)");

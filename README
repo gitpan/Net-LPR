@@ -1,4 +1,4 @@
-Net::LPR version 1.006
+Net::LPR version 1.007
 ======================
 
 DESCRIPTION
@@ -34,4 +34,4 @@ COPYRIGHT AND LICENCE
 This module is available for copying and distribution under the same terms
 as Perl itself.
 
-Copyright (C) 2002 David M. Lloyd <dmlloyd@cpan.org>
+Copyright (C) 2002-2004 David M. Lloyd <dmlloyd@cpan.org>

@@ -23,3 +23,6 @@ Revision history for Perl extension Net::LPR.
 
 1.006  Apr 1, 2004
 	Fix a bug where the global jobid may run rampant when new_job() is called without arguments (thanks to Daniel Hentschel).
+
+1.007  Aug 23, 2004
+	Fix a bug where a warning is printed if use warnings; is in effect and reading from the printer socket failed after sending some date (thanks to Chris Donoghue).
