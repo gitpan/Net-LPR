@@ -11,7 +11,7 @@ use Sys::Hostname;
 
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 
-$VERSION = '1.004';
+$VERSION = '1.005';
 
 my %valid_options = (
     StrictRFCPorts => 1,
@@ -568,7 +568,7 @@ sub job_set_control_filename {
         return undef;
     }
     
-    $self->{Jobs}->{$jobkey}->{DataFileName} = $text;
+    $self->{Jobs}->{$jobkey}->{ControlFileName} = $text;
 
     return 1;
 }

@@ -17,3 +17,6 @@ Revision history for Perl extension Net::LPR.
 
 1.004  May 1, 2003
 	Work around Solaris 2.6 bahavior when creating a socket whose address is in use (EBADF).
+
+1.005  Jan 6, 2004
+	Fix a bug where the set_control_filename method was actually setting the data file name (thanks to Andreas Håkansson).
